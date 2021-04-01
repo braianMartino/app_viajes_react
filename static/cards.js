@@ -5,6 +5,10 @@ var urlIm1 = "https://www.freejpg.com.ar/image-900/06/0660/F100012782-costa_en_l
 var urlIm2 = "https://www.freejpg.com.ar/image-900/32/3246/F100011740-cabildo_de_buenos_aires_en_plaza_de_mayo.jpg";
 var urlIm3 = "https://www.freejpg.com.ar/image-900/8d/8d6c/F100011737-paisaje_de_la_isla_san_martin_y_las_cataratas_del_iguazu_en_verano.jpg";
 
+function emuEsperar(cuantosMilisegundos) { //U: para simular demoras con await
+	return new Promise( (onOk) => setTimeout(onOk, cuantosMilisegundos) );
+}
+
 function emuTraerTarjetas() {
     return [
         {nombre: 'Eros Martino', fotoCara: url1, imagen: urlIm1, texto: 'Costa en la ciudad de Mar del Plata, Buenos Aires', tags: 'Hermosa Mar del Plata #MDQ #mardel' },
@@ -12,6 +16,14 @@ function emuTraerTarjetas() {
         {nombre: 'Facundo Benitez', fotoCara: url3, imagen: urlIm3, texto: 'Cataratas del Iguazú, Misiones', tags: '#cataratas #iguazu #misiones ' }
     ]
 };
+
+async function apiTarjetas() {
+	//ALT podriamos usar promesas, fetch('http://127.0.0.1:8000/api/lugar/').then( res => res.json() )
+	const res= await fetch('http://127.0.0.1:8000/api/lugar/');
+	const data= await res.json();
+	await emuEsperar(15000); //A: simulamos que el servidor demora
+	return data.results.map( cadaLugar => { cadaLugar.fotoCara= url1; return cadaLugar } ); //TODO: no necesitar foto cara
+}
 
 var Tarjeta = React.createClass({
     render: function() {
@@ -57,20 +69,24 @@ var Tarjeta = React.createClass({
 
 var Cards = React.createClass({
     getInitialState: function() {
-        const tarjetas = emuTraerTarjetas();
+				apiTarjetas().then( tarjetasQueTraje => this.setState({tarjetas: tarjetasQueTraje}) );
+				//A: pedi los lugares del servidor, cuando esten va a actualizar state y llamar render
+
         return {   
-            tarjetas: tarjetas
+            tarjetas: null //A: mientras, devuelvo una lista vacia, TODO: usar "loading"
         };
     },
     render: function() {
+				const tarjetas= this.state.tarjetas;
         return (
             <Ons.Page renderToolbar={this.renderToolbar}>  
                 <section>
-                    {this.state.tarjetas.map((
-                        estaTarjeta
-                    ) => (
-                        <Tarjeta tarjeta={estaTarjeta}/>
-                    ))}
+										{ tarjetas==null  //A: todavia no cargo las tarjetas
+											? <Ons.ProgressCircular indeterminate />
+											: tarjetas.map(( estaTarjeta) => (
+													<Tarjeta tarjeta={estaTarjeta}/>
+												))
+										}
                 </section>
             </Ons.Page>
       );
