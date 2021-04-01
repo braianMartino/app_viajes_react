@@ -7,7 +7,7 @@ var urlIm3 = "https://www.freejpg.com.ar/image-900/8d/8d6c/F100011737-paisaje_de
 
 function emuEsperar(cuantosMilisegundos) { //U: para simular demoras con await
 	return new Promise( (onOk) => setTimeout(onOk, cuantosMilisegundos) );
-}
+};
 
 function emuTraerTarjetas() {
     return [
@@ -21,75 +21,42 @@ async function apiTarjetas() {
 	//ALT podriamos usar promesas, fetch('http://127.0.0.1:8000/api/lugar/').then( res => res.json() )
 	const res= await fetch('http://127.0.0.1:8000/api/lugar/');
 	const data= await res.json();
-	await emuEsperar(15000); //A: simulamos que el servidor demora
-	return data.results.map( cadaLugar => { cadaLugar.fotoCara= url1; return cadaLugar } ); //TODO: no necesitar foto cara
-}
-
-var Tarjeta = React.createClass({
-    render: function() {
-        const tarjeta = this.props.tarjeta;
-        return (
-            <Ons.Card>
-                <Ons.ListItem>
-                    <div className="left">
-                        <img className="list-item__thumbnail" src={tarjeta.fotoCara} />
-                    </div>
-                    <div className="center">
-                        <div className="list-item__title"><b>{tarjeta.nombre}</b></div>
-                        <div className="list-item__subtitle" style={{fontSize: "12px"}}>{tarjeta.texto}</div>
-                    </div>
-                    <div className="right"><Ons.Button className="corner-button" modifier="quiet"><Ons.Icon icon="ion-ios-more,material:ion-android-more-vertical">
-                        </Ons.Icon></Ons.Button>
-                    </div>
-                </Ons.ListItem>
-
-                <div style={{textAlign: "center", position: "relative"}} >
-                    <img className="post-image" src={tarjeta.imagen} />
-                </div>
-
-                <Ons.ListItem className="post-button-bar" modifier="nodivider">
-                    <div className="center" style={{paddingTop: "0px"}}>
-                        <Ons.Button className="post-button" modifier="quiet" ><Ons.Icon id="button-post-like-1" icon="ion-ios-heart-outline"></Ons.Icon></Ons.Button>
-                        <Ons.Button className="post-button" modifier="quiet"><Ons.Icon icon="ion-ios-chatbubble-outline"></Ons.Icon></Ons.Button>
-                        <Ons.Button className="post-button" modifier="quiet"><Ons.Icon icon="ion-ios-paperplane-outline"></Ons.Icon></Ons.Button>
-                    </div>
-                    <div className="right corner-button bookmark">
-                        <Ons.Button class="post-button" modifier="quiet"><Ons.Icon icon="md-bookmark-outline"></Ons.Icon></Ons.Button>
-                    </div>
-                </Ons.ListItem>
-
-                <div className="post-like-info"><b>someone_one</b> and 24 other liked this.</div>
-                <div className="post-caption"><b>{tarjeta.nombre}</b> {tarjeta.tags} </div>
-                <div className="post-time">1 HOUR AGO</div>
-            </Ons.Card>
-        );
-    }
-    
-});
+	await emuEsperar(3000); //A: simulamos que el servidor demora
+	return data.results;
+};
 
 var Cards = React.createClass({
-    getInitialState: function() {
-				apiTarjetas().then( tarjetasQueTraje => this.setState({tarjetas: tarjetasQueTraje}) );
-				//A: pedi los lugares del servidor, cuando esten va a actualizar state y llamar render
 
+    recargarTarjetas: function() { // vuelve a hacer la llamada, actualiza state y renderiza de nuevo
+        apiTarjetas().then( tarjetasQueTraje => this.setState({tarjetas: tarjetasQueTraje}) );
+    },
+
+    getInitialState: function() {
+		this.recargarTarjetas();
+		//A: pedi los lugares del servidor, cuando esten va a actualizar state y llamar render
         return {   
             tarjetas: null //A: mientras, devuelvo una lista vacia, TODO: usar "loading"
         };
     },
+
     render: function() {
-				const tarjetas= this.state.tarjetas;
+		const tarjetas= this.state.tarjetas;
         return (
             <Ons.Page renderToolbar={this.renderToolbar}>  
                 <section>
-										{ tarjetas==null  //A: todavia no cargo las tarjetas
-											? <Ons.ProgressCircular indeterminate />
-											: tarjetas.map(( estaTarjeta) => (
-													<Tarjeta tarjeta={estaTarjeta}/>
-												))
-										}
+                    <Ons.PullHook 
+                        onChange={this.recargarTarjetas /*componente Pull para llamar de nuevo a apiTarjetas*/}          
+                    >
+                        <Ons.ProgressCircular indeterminate />
+                    </Ons.PullHook>
+                    { tarjetas==null  //A: todavia no cargo las tarjetas
+                        ? <Ons.ProgressCircular indeterminate />
+                        : tarjetas.map(( estaTarjeta ) => (
+                                <Tarjeta tarjeta={estaTarjeta}/>
+                        ))
+                    }
                 </section>
             </Ons.Page>
       );
     }
 });
-  
