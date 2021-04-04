@@ -1,8 +1,20 @@
+function apiObtenerFavoritos() {
+  let listaFavoritos = JSON.parse(localStorage.Favoritos || "{}"); //A: Si no hay nada en localStorage asignamos un objeto vacio
+  listaFavoritos = Object.entries(listaFavoritos); //A: Me devuelve un array donde cada posicion del mismo es un arreglo ['key', 'value']
+  listaFavoritos = listaFavoritos.filter(
+    //A: Filtro el array devuelto para obtener solo las tarjetas marcadas como favoritas
+    (tarjetaFavorita) => tarjetaFavorita[1] === true
+  );
+  listaFavoritos = listaFavoritos.map((tarjeta) => tarjeta[0]); //A: Termino guardando solo los nombres de los lugares (es decir su key, no su value)
+  return listaFavoritos;
+}
+
 var MyRadioButtons = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       vegetables: ["Tomato", "Cucumber", "Onion", "Eggplant", "Cabbage"],
-      selectedVegetable: "Onion"
+      selectedVegetable: "",
+      tarjetasFavoritas: apiObtenerFavoritos(),
     };
   },
 
@@ -27,14 +39,14 @@ var MyRadioButtons = React.createClass({
     );
   },
 
-  render: function() {
+  render: function () {
     return (
       <Ons.Page renderToolbar={this.renderToolbar}>
         <Ons.List
-          dataSource={this.state.vegetables}
+          dataSource={this.state.tarjetasFavoritas} //A: Paso como prop el array de tarjetas favoritas en vez de vegetables
           renderRow={this.renderRadioRow}
         />
       </Ons.Page>
     );
-  }
+  },
 });
