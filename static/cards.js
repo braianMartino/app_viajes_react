@@ -50,11 +50,27 @@ async function apiTarjetas() {
   return data.results;
 }
 
-const Favoritos = JSON.parse(localStorage.Favoritos || "{}");
-
+var Favoritos_ = null;
+function apiLeerFavoritos() {
+  if ( Favoritos_ != null ) return Favoritos_; //A: ya lo teniamos leido
+  var x;
+  try { 
+    x = JSON.parse(localStorage.Favoritos || "{}"); //A: leo Favoritos
+  }
+  catch {
+    //A: lo resolvemos más abajo
+  }
+  if ( x == null || typeof(x) != "object" ) {
+    x = {}; //A: x siempre es un diccinario
+  }
+  Favoritos_ = x;
+  return Favoritos_;
+} 
 function apiCambiarFavorito(unaTarjeta) {
-  Favoritos[unaTarjeta.nombre] = !Favoritos[unaTarjeta.nombre];
-  localStorage.Favoritos = JSON.stringify(Favoritos);
+  const favoritos = apiLeerFavoritos();
+  favoritos[unaTarjeta.nombre] = !favoritos[unaTarjeta.nombre];
+  localStorage.Favoritos = JSON.stringify(favoritos); //A: escribo Favoritos
+  console.log(favoritos[unaTarjeta.nombre])
 }
 
 var Cards = React.createClass({
@@ -82,6 +98,7 @@ var Cards = React.createClass({
 
   render: function () {
     const tarjetas = this.state.tarjetas;
+    const favoritos = apiLeerFavoritos();
     return (
       <Ons.Page renderToolbar={this.renderToolbar}>
         <section>
@@ -102,7 +119,7 @@ var Cards = React.createClass({
                 cambiarFavorito={(unaTarjeta) =>
                   this.cambiarFavorito(unaTarjeta)
                 }
-                esFavorito={Favoritos[estaTarjeta.nombre]}
+                esFavorito={favoritos[estaTarjeta.nombre]}
               />
             ))
           )}

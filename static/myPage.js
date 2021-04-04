@@ -37,8 +37,8 @@ var MyPage = React.createClass({
         tab: <Ons.Tab label="Home" icon="md-view-day" />,
       },
       {
-        content: <MyRadioButtons content="Change the settings" />,
-        tab: <Ons.Tab label="Favoritos" icon="md-settings" />, //A: Cambié el nombre de Settings a Favoritos (Marcelo)
+        content: <Favoritos content="Change the settings" />,
+        tab: <Ons.Tab label="Favoritos" icon="ion-ios-heart" />, //A: Cambié el nombre de Settings a Favoritos (Marcelo)
       },
       {
         content: <MyUsuariosTab />, //Agrego TAB Users y defino content

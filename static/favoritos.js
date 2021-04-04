@@ -9,7 +9,7 @@ function apiObtenerFavoritos() {
   return listaFavoritos;
 }
 
-var MyRadioButtons = React.createClass({
+var Favoritos = React.createClass({
   getInitialState: function () {
     return {
       vegetables: ["Tomato", "Cucumber", "Onion", "Eggplant", "Cabbage"],
