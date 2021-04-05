@@ -50,7 +50,14 @@ async function apiTarjetas() {
   return data.results;
 }
 
-const Favoritos = JSON.parse(localStorage.Favoritos || "{}");
+async function apiTarjetasDict() {
+  const listaTarjetas = await apiTarjetas();
+  const result = {};
+  listaTarjetas.forEach((t) => (result[t.id] = t));
+  return result;
+}
+
+const Favoritos = JSON.parse(localStorage.Favoritos || "{}"); //A: Si no hay nada en localStorage asignamos un objeto vacio
 
 function apiCambiarFavorito(unaTarjeta) {
   Favoritos[unaTarjeta.nombre] = !Favoritos[unaTarjeta.nombre];
