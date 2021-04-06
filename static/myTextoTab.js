@@ -29,4 +29,6 @@ const listarUsuarios = async () => {
 
   const usuarios = json.results.map(e => e.username);
   return usuarios;
+  
 };
+listarUsuarios();

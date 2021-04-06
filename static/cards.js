@@ -50,8 +50,17 @@ async function apiTarjetas() {
   return data.results;
 }
 
+const leerFavoritosApi = async () => {//A: cargo lista favoritos desde la API
+  const response = await fetch("http://127.0.0.1:8000/api/favorito/");
+  const json = await response.json();
+  const favoritoUsuario = json.results;
+  console.log(favoritoUsuario);
+  return favoritoUsuario;
+};
+leerFavoritosApi();
+
 var Favoritos_ = null;
-function apiLeerFavoritos() {
+function leerFavoritoStorage() {
   if ( Favoritos_ != null ) return Favoritos_; //A: ya lo teniamos leido
   var x;
   try { 
@@ -65,12 +74,33 @@ function apiLeerFavoritos() {
   }
   Favoritos_ = x;
   return Favoritos_;
-} 
-function apiCambiarFavorito(unaTarjeta) {
-  const favoritos = apiLeerFavoritos();
+};
+
+async function cambiarFavoritoApi ( lugar ) {
+  var url = 'http://127.0.0.1:8000/api/favorito/';
+  var data = {lugar: lugar,
+              de_quien: 2}; //TODO: no hardcodear lo puse para probar
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  })
+  const resData = await res.json();
+  if ( resData.non_field_errors &&
+    resData.non_field_errors[0] == "The fields lugar, de_quien must make a unique set." ) {
+    //A: todo bien, ya estaba
+  } else {
+    throw resData;
+  }
+  //DBG: console.log(resData);
+};
+
+function cambiarFavoritoStorage(unaTarjeta) {
+  const favoritos = leerFavoritoStorage();
   favoritos[unaTarjeta.nombre] = !favoritos[unaTarjeta.nombre];
   localStorage.Favoritos = JSON.stringify(favoritos); //A: escribo Favoritos
-  console.log(favoritos[unaTarjeta.nombre])
 }
 
 var Cards = React.createClass({
@@ -82,7 +112,7 @@ var Cards = React.createClass({
   },
 
   cambiarFavorito: function (unaTarjeta) {
-    apiCambiarFavorito(unaTarjeta);
+    cambiarFavoritoStorage(unaTarjeta);
     this.setState({
       actualizar: unaTarjeta, //A: Dibujar de nuevo
     });
@@ -98,7 +128,7 @@ var Cards = React.createClass({
 
   render: function () {
     const tarjetas = this.state.tarjetas;
-    const favoritos = apiLeerFavoritos();
+    const favoritos = leerFavoritoStorage();
     return (
       <Ons.Page renderToolbar={this.renderToolbar}>
         <section>

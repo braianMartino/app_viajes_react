@@ -61,3 +61,5 @@ var MyLogin = React.createClass({
     );
   }
 });
+
+const usuariosFav = {nombre: "Mirta", id: 4}
