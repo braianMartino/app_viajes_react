@@ -49,15 +49,15 @@ async function apiTarjetas() {
   await emuEsperar(3000); //A: simulamos que el servidor demora
   return data.results;
 }
+async function apiTarjetasDict() {
+  const listaTarjetas = await apiTarjetas();
+  const result = {};
+  listaTarjetas.forEach((t) => (result[t.id] = t));
+  return result;
+}
 
-const leerFavoritosApi = async () => {//A: cargo lista favoritos desde la API
-  const response = await fetch("http://127.0.0.1:8000/api/favorito/");
-  const json = await response.json();
-  const favoritoUsuario = json.results;
-  console.log(favoritoUsuario);
-  return favoritoUsuario;
-};
-leerFavoritosApi();
+const Favoritos = JSON.parse(localStorage.Favoritos || "{}"); //A: Si no hay nada en localStorage asignamos un objeto vacio
+
 
 var Favoritos_ = null;
 function leerFavoritoStorage() {

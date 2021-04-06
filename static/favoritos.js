@@ -1,40 +1,42 @@
-function apiObtenerFavoritos() {
-  let listaFavoritos = JSON.parse(localStorage.Favoritos || "{}"); //A: Si no hay nada en localStorage asignamos un objeto vacio
-  listaFavoritos = Object.entries(listaFavoritos); //A: Me devuelve un array donde cada posicion del mismo es un arreglo ['key', 'value']
-  listaFavoritos = listaFavoritos.filter(
-    //A: Filtro el array devuelto para obtener solo las tarjetas marcadas como favoritas
-    (tarjetaFavorita) => tarjetaFavorita[1] === true
-  );
-  listaFavoritos = listaFavoritos.map((tarjeta) => tarjeta[0]); //A: Termino guardando solo los nombres de los lugares (es decir su key, no su value)
+async function apiFavoritos() {
+  const res = await fetch("http://127.0.0.1:8000/api/favorito/");
+  const data = await res.json();
+  return data.results;
+}
+
+async function obtenerListaFavoritos() {
+  const idFavoritos = await apiFavoritos(); //A: Traigo los IDs de las tarjetas faveadas y quien las faveo
+  const tarjetas = await apiTarjetasDict(); //A: Traigo todas las tarjetas de la API
+  let listaFavoritos = idFavoritos.map((fav) => tarjetas[fav.lugar]);
   return listaFavoritos;
 }
 
 var Favoritos = React.createClass({
   getInitialState: function () {
+    this.traerTarjetasFavoritas();
     return {
       vegetables: ["Tomato", "Cucumber", "Onion", "Eggplant", "Cabbage"],
       selectedVegetable: "",
-      tarjetasFavoritas: apiObtenerFavoritos(),
+      tarjetasFavoritas: null,
     };
+  },
+
+  traerTarjetasFavoritas: function () {
+    obtenerListaFavoritos().then((tarjetasFavoritas) => {
+      this.setState({
+        tarjetasFavoritas: tarjetasFavoritas,
+      });
+    });
   },
 
   handleVegetableChange(vegetable) {
     this.setState({ selectedVegetable: vegetable });
   },
 
-  renderRadioRow(row) {
+  renderFavoritoRow(row) {
     return (
-      <Ons.ListItem key={row} tappable>
-        <label className="left">
-          <Ons.Radio
-            inputId={`radio-${row}`}
-            checked={row === this.state.selectedVegetable}
-            onChange={this.handleVegetableChange.bind(this, row)}
-          />
-        </label>
-        <label htmlFor={`radio-${row}`} className="center">
-          {row}
-        </label>
+      <Ons.ListItem key={row.id} tappable>
+        {row.nombre}
       </Ons.ListItem>
     );
   },
@@ -42,10 +44,14 @@ var Favoritos = React.createClass({
   render: function () {
     return (
       <Ons.Page renderToolbar={this.renderToolbar}>
-        <Ons.List
-          dataSource={this.state.tarjetasFavoritas} //A: Paso como prop el array de tarjetas favoritas en vez de vegetables
-          renderRow={this.renderRadioRow}
-        />
+        {!this.state.tarjetasFavoritas ? (
+          <Ons.ProgressCircular indeterminate />
+        ) : (
+          <Ons.List
+            dataSource={this.state.tarjetasFavoritas} //A: Paso como prop el array de tarjetas favoritas en vez de vegetables
+            renderRow={this.renderFavoritoRow}
+          />
+        )}
       </Ons.Page>
     );
   },
