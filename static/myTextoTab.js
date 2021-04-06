@@ -24,7 +24,7 @@ let url = "https://si.podemosaprender.org/api/participante/";
 
 const listarUsuarios = async () => {
   // do the API call and get JSON response
-  const response = await fetch(url);
+  const response = await fetchConToken(url);
   const json = await response.json();
 
   const usuarios = json.results.map(e => e.username);

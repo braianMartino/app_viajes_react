@@ -1,3 +1,6 @@
+
+var idUsuarioLogeado = null;
+
 var MyLogin = React.createClass({
   getInitialState: function() {
     return {
@@ -19,6 +22,13 @@ var MyLogin = React.createClass({
       this.state.password === "barrilete"
     ) {
       this.props.cuandoOk();
+      idUsuarioLogeado = 1;
+    } else if (
+      this.state.username === "mirta" &&
+      this.state.password === "barrilete"
+    ) {
+      this.props.cuandoOk();
+      idUsuarioLogeado = 2;
     } else {
       ons.notification.alert("Username or password incorrect!");
     }
@@ -61,5 +71,3 @@ var MyLogin = React.createClass({
     );
   }
 });
-
-const usuariosFav = {nombre: "Mirta", id: 4}

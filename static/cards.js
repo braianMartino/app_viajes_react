@@ -149,7 +149,6 @@ var Cards = React.createClass({
                 cambiarFavorito={(unaTarjeta) =>
                   this.cambiarFavorito(unaTarjeta)
                 }
-                esFavorito={favoritos[estaTarjeta.nombre]}
               />
             ))
           )}
