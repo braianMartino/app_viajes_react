@@ -21,14 +21,14 @@ var MyLogin = React.createClass({
       this.state.username === "braian" &&
       this.state.password === "barrilete"
     ) {
-      this.props.cuandoOk();
       idUsuarioLogeado = 1;
+      this.props.cuandoOk(idUsuarioLogeado);
     } else if (
       this.state.username === "mirta" &&
       this.state.password === "barrilete"
     ) {
-      this.props.cuandoOk();
       idUsuarioLogeado = 2;
+      this.props.cuandoOk(idUsuarioLogeado);
     } else {
       ons.notification.alert("Username or password incorrect!");
     }

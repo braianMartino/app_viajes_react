@@ -106,8 +106,9 @@ function cambiarFavoritoStorage(unaTarjeta) {
 var Cards = React.createClass({
   recargarTarjetas: function () {
     // vuelve a hacer la llamada, actualiza state y renderiza de nuevo
-    apiTarjetas().then((tarjetasQueTraje) =>
-      this.setState({ tarjetas: tarjetasQueTraje })
+    const funcionTarjetas = this.props.funcionTarjetas || apiTarjetas;
+    funcionTarjetas().then((tarjetasQueTraje) =>
+      this.setState({ tarjetas: tarjetasQueTraje, usuarioId: this.props.usuarioId })
     );
   },
 
@@ -119,7 +120,7 @@ var Cards = React.createClass({
   },
 
   getInitialState: function () {
-    this.recargarTarjetas();
+    
     //A: pedi los lugares del servidor, cuando esten va a actualizar state y llamar render
     return {
       tarjetas: null, //A: mientras, devuelvo una lista vacia, TODO: usar "loading"
@@ -127,16 +128,19 @@ var Cards = React.createClass({
   },
 
   render: function () {
+    console.log("render", this.state, this.props)
+    if (this.state.usuarioId != this.props.usuarioId) {
+      this.recargarTarjetas();
+      
+      return null;
+    }
     const tarjetas = this.state.tarjetas;
     const favoritos = leerFavoritoStorage();
     return (
       <Ons.Page renderToolbar={this.renderToolbar}>
         <section>
           <Ons.PullHook
-            onChange={
-              this
-                .recargarTarjetas /*componente Pull para llamar de nuevo a apiTarjetas*/
-            }
+            onChange={this.recargarTarjetas} /*componente Pull para llamar de nuevo a apiTarjetas*/
           >
             <Ons.ProgressCircular indeterminate />
           </Ons.PullHook>

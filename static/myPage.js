@@ -22,8 +22,8 @@ var MyPage = React.createClass({
     );
   },
 
-  cuandoLoginOk: function () {
-    this.setState({ index: 1 });
+  cuandoLoginOk: function ( usuarioId ) {
+    this.setState({ index: 1, usuarioId });
   },
 
   renderTabs: function () {
@@ -33,11 +33,11 @@ var MyPage = React.createClass({
         tab: <Ons.Tab label="Login" icon="md-home" />,
       },
       {
-        content: <Home />,
+        content: <Home usuarioId={this.state.usuarioId}/>,
         tab: <Ons.Tab label="Home" icon="md-view-day" />,
       },
       {
-        content: <Favoritos content="Change the settings" />,
+        content: <Favoritos content="Change the settings" usuarioId={this.state.usuarioId}/>,
         tab: <Ons.Tab label="Favoritos" icon="ion-ios-heart" />, //A: Cambié el nombre de Settings a Favoritos (Marcelo)
       },
       {
