@@ -108,7 +108,10 @@ var Cards = React.createClass({
     // vuelve a hacer la llamada, actualiza state y renderiza de nuevo
     const funcionTarjetas = this.props.funcionTarjetas || apiTarjetas;
     funcionTarjetas().then((tarjetasQueTraje) =>
-      this.setState({ tarjetas: tarjetasQueTraje, usuarioId: this.props.usuarioId })
+      this.setState({ 
+        tarjetas: tarjetasQueTraje, 
+        usuarioId: this.props.usuarioId //A: para no volver a pedir tarjetas 
+      })
     );
   },
 
@@ -129,10 +132,10 @@ var Cards = React.createClass({
 
   render: function () {
     console.log("render", this.state, this.props)
-    if (this.state.usuarioId != this.props.usuarioId) {
+    if (this.state.usuarioId != this.props.usuarioId) { //A: myPage cambio usuarioId
       this.recargarTarjetas();
       
-      return null;
+      return <Ons.ProgressCircular indeterminate />;
     }
     const tarjetas = this.state.tarjetas;
     const favoritos = leerFavoritoStorage();
